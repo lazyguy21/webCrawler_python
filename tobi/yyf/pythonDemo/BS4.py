@@ -8,6 +8,8 @@ __author__ = 'ye'
 try:
     html = urlopen("http://www.pythonscraping.com/exercises/exercise1.html_mock")
     bsObj = BeautifulSoup(html.read())
+    bsObj.findAll()
+    bsObj.get_text
     print(bsObj.h1)
 except Exception as error:
     print("hehe : ",error)
