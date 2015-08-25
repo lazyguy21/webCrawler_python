@@ -1,3 +1,4 @@
+from concurrent.futures import ThreadPoolExecutor
 import re
 from urllib.request import urlopen, Request
 from bs4 import BeautifulSoup
@@ -41,10 +42,9 @@ def handleImageTagList(images):
                 imageName=extractImageNameFromURL(src_)
             try:
                 bytes = tryOpenURL(src_)
-                file_io = open('/home/ye/Pictures/test/' + imageName, 'wb')
-                file_io.write(bytes)
-                print('图片保存成功 : ',alt_,src_)
-                file_io.close()
+                with open('/home/ye/Pictures/test/' + imageName, 'wb') as file_io:
+                    file_io.write(bytes)
+                    print('图片保存成功 : ',alt_,src_)
             finally:
                 savedImgSet.add(src_)
 
@@ -54,7 +54,9 @@ def handleLink(url):
     bytes=tryOpenURL(url)
     bsObj=BeautifulSoup(bytes,"html5lib")
     images = bsObj.findAll("img")
-    handleImageTagList(images)
+
+    executor.submit(handleImageTagList,images)
+    # handleImageTagList(images)
     aLinks = bsObj.findAll("a")
     searchedLink.add(url)
     for aLink in aLinks:
@@ -65,6 +67,7 @@ url= 'http://mz.youmtu.com'
 # http://baozoumanhua.com
 searchedLink=set()
 savedImgSet=set()
+executor = ThreadPoolExecutor(max_workers=10)
 handleLink(url)
 
 
